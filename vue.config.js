@@ -47,16 +47,6 @@ module.exports = {
         pathRewrite: {
           '^/dev-api': ''
         }
-      },
-      // 匹配所有以 /dev-api 开头的请求路径
-      '/prod-api': {
-        target: 'https://175.178.174.83:1110',
-        // 支持跨域
-        changeOrigin: true,
-        // 重写路径: 去掉路径开头的 '/dev-api'
-        pathRewrite: {
-          '^/prod-api': ''
-        }
       }
     }
   },
