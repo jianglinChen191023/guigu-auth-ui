@@ -54,13 +54,11 @@ export function removeById(id) {
 }
 
 // 批量删除
-export function removeByIds(ids) {
+export function removeByIds(data) {
   return request({
     url: `${api_name}/removeByIds`,
     method: 'delete',
-    data: {
-      ids
-    }
+    data
   })
 }
 

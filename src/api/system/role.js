@@ -46,12 +46,10 @@ export function getRoleById(id) {
 }
 
 // 批量删除
-export function batchRemove(ids) {
+export function batchRemove(data) {
   return request({
     url: `${api_name}/batchRemove`,
     method: 'delete',
-    data: {
-      ids
-    }
+    data
   })
 }
