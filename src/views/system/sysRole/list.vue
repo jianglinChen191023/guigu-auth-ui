@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { getPageList, removeById, getRoleById, update, save, batchRemove } from '@/api/role/role'
+import { getPageList, removeById, getRoleById, update, save, batchRemove } from '@/api/system/role'
 
 export default {
   name: 'List',
