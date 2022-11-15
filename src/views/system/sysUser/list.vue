@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <!-- 卡片视图区域 -->
     <el-card>
       <el-row :gutter="22">
@@ -63,7 +62,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column label="操作" width="130px">
+        <el-table-column label="操作" width="180px">
           <template slot-scope="scope">
             <!-- 修改 -->
             <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialogVisible(scope.row.id)" />
@@ -74,6 +73,15 @@
               icon="el-icon-delete"
               @click="removeDataById(scope.row.id)"
             />
+            <!-- 分配角色按钮 -->
+            <el-tooltip effect="dark" content="分配角色" placement="top-start" :enterable="false">
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+                @click="showAssignRole(scope.row)"
+              />
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -119,11 +127,34 @@
         <el-button type="primary" @click="saveOrUpdate">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" :visible.sync="dialogRoleVisible">
+      <el-form label-width="80px">
+        <el-form-item label="用户名">
+          <el-input disabled :value="sysUser.username" />
+        </el-form-item>
+
+        <el-form-item label="角色列表">
+          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选
+          </el-checkbox>
+          <div style="margin: 15px 0;" />
+          <el-checkbox-group v-model="userRoleIds" @change="handleCheckedChange">
+            <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">{{ role.roleName }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button type="primary" size="small" @click="assignRole">保存</el-button>
+        <el-button size="small" @click="dialogRoleVisible = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { save, updateStatus, update, getById, getPageList, removeById, removeByIds } from '@/api/system/user'
+import { getRolesByUserId, doAssign } from '@/api/system/role'
 
 export default {
   name: 'List',
@@ -238,7 +269,19 @@ export default {
             picker.$emit('pick', [start, end])
           }
         }]
-      }
+      },
+      /* 分配角色 */
+      sysUser: {},
+      // 分配角色控制对话框的显示与隐藏
+      dialogRoleVisible: false,
+      // 所有角色列表
+      allRoles: [],
+      // 用户的角色ID的列表
+      userRoleIds: [],
+      // 是否是不确定的
+      isIndeterminate: false,
+      // 是否全选
+      checkAll: false
     }
   },
   watch: {
@@ -279,11 +322,11 @@ export default {
     },
     handleSizeChange(newSize) {
       this.limit = newSize
-      this.list()
+      this.getList()
     },
     handleCurrentChange(newPage) {
       this.page = newPage
-      this.list()
+      this.getList()
     },
     // 保存或修改用户
     saveOrUpdate() {
@@ -393,6 +436,50 @@ export default {
           type: 'info',
           message: '已取消删除'
         })
+      })
+    },
+    /* 分配权限 */
+    // 展示分配角色
+    showAssignRole(row) {
+      this.sysUser = row
+      getRolesByUserId(row.id).then(response => {
+        this.allRoles = response.data.allRoles
+        this.userRoleIds = response.data.userRoleIds
+        this.checkAll = this.userRoleIds.length === this.allRoles.length
+        this.isIndeterminate = this.userRoleIds.length > 0 && this.userRoleIds.length < this.allRoles.length
+
+        // 显示弹框
+        this.dialogRoleVisible = true
+      })
+    },
+
+    // 全选勾选状态发生改变的监听
+    // value 当前勾选状态 true/false
+    handleCheckAllChange(value) {
+      // 如果当前全选, userRoleIds就是所有角色id的数组, 否则是空数组
+      this.userRoleIds = value ? this.allRoles.map(item => item.id) : []
+      // 如果当前不是全选也不全不选时, 指定为false
+      this.isIndeterminate = false
+    },
+
+    // 角色列表选中项发生改变的监听
+    handleCheckedChange(value) {
+      const { userRoleIds, allRoles } = this
+      this.checkAll = userRoleIds.length === allRoles.length && allRoles.length > 0
+      this.isIndeterminate = userRoleIds.length > 0 && userRoleIds.length < allRoles.length
+    },
+
+    // 分配角色
+    assignRole() {
+      const assginRoleVo = {
+        userId: this.sysUser.id,
+        roleIdList: this.userRoleIds
+      }
+
+      doAssign(assginRoleVo).then(res => {
+        this.$message.success('分配角色成功!')
+        this.dialogRoleVisible = false
+        this.getList()
       })
     }
   }

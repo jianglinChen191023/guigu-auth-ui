@@ -147,11 +147,11 @@ export default {
     },
     handleSizeChange(newSize) {
       this.limit = newSize
-      this.list()
+      this.getList()
     },
     handleCurrentChange(newPage) {
       this.page = newPage
-      this.list()
+      this.getList()
     },
     // 保存或修改角色
     saveOrUpdate() {

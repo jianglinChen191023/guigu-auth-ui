@@ -2,6 +2,23 @@ import request from '@/utils/request'
 
 const api_name = '/admin/system/sysRole'
 
+// 根据用户id获取角色
+export function getRolesByUserId(userId) {
+  return request({
+    url: `${api_name}/getRolesByUserId/${userId}`,
+    method: 'get'
+  })
+}
+
+// 分配角色
+export function doAssign(data) {
+  return request({
+    url: `${api_name}/doAssign`,
+    method: 'post',
+    data
+  })
+}
+
 // 列表
 export function getPageList(page, limit, params) {
   return request({
