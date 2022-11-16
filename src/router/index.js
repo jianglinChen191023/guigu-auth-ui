@@ -72,6 +72,12 @@ export const constantRoutes = [
         name: 'SysUser',
         component: () => import('@/views/system/sysUser/list'),
         meta: { title: '用户管理', icon: 'table' }
+      },
+      {
+        path: 'sysMenu',
+        name: 'SysMenu',
+        component: () => import('@/views/system/sysMenu/list'),
+        meta: { title: '菜单管理', icon: 'table' }
       }
     ]
   },
