@@ -27,21 +27,28 @@
         stripe
         @selection-change="handleSelectionChange"
       >
+        <!-- 索引列 -->
         <el-table-column type="selection" />
         <el-table-column prop="roleName" label="角色名称" />
         <el-table-column prop="roleCode" label="角色编码" />
         <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column label="操作" width="130px">
+        <!-- 操作 -->
+        <el-table-column label="操作" width="300px">
           <template slot-scope="scope">
             <!-- 修改 -->
-            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialogVisible(scope.row.id)" />
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialogVisible(scope.row.id)">
+              编辑
+            </el-button>
             <!-- 删除 -->
-            <el-button
-              size="mini"
-              type="danger"
-              icon="el-icon-delete"
-              @click="removeDataById(scope.row.id)"
-            />
+            <el-button size="mini" type="danger" icon="el-icon-delete" @click="removeDataById(scope.row.id)">
+              删除
+            </el-button>
+            <!-- 分配权限 -->
+            <el-tooltip effect="dark" content="分配权限" placement="top-start" :enterable="false">
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="openAssignDialog(scope.row.id)">
+                分配权限
+              </el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -82,16 +89,52 @@
       </span>
     </el-dialog>
 
+    <el-dialog
+      title="分配权限"
+      :visible.sync="assignDialogVisible"
+      width="50%"
+      @close="assignDialogClose"
+    >
+      <el-tree
+        ref="tree"
+        :data="menuList"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :default-checked-keys="defKeys"
+        :props="defaultProps"
+      />
+      <!-- 底部区域 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="assignDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleMenu">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getPageList, removeById, getRoleById, update, save, batchRemove } from '@/api/system/role'
+import { saveRoleMenu, getMenuListByRoleId } from '@/api/system/menu'
 
 export default {
   name: 'List',
   data() {
     return {
+      /* 分配权限 */
+      // 控制对话框隐藏或显示
+      assignDialogVisible: false,
+      // 打开分配权限对话框时 存储角色id
+      roleId: '',
+      // 角色拥有的菜单id
+      defKeys: [],
+      // 树形菜单
+      menuList: {},
+      defaultProps: {
+        children: 'children',
+        label: 'name'
+      },
+
       // 角色列表
       list: [],
       // 总记录数
@@ -138,6 +181,58 @@ export default {
     this.getList()
   },
   methods: {
+    /* 分配权限 */
+    // 打开对话框
+    openAssignDialog(id) {
+      this.roleId = id
+      // 获取角色拥有的菜单
+      getMenuListByRoleId(id).then(res => {
+        this.menuList = res.data
+        if (this.menuList && this.menuList.length > 0) {
+          this.menuList.forEach(menu => {
+            // 设置选中菜单
+            this.getLeafKeys(menu)
+          })
+        }
+
+        // 显示对话框
+        this.assignDialogVisible = true
+      })
+    },
+    // 通过递归的形式, 获取角色下所有三级权限的 Id, 并保存到 defKeys 数组中
+    getLeafKeys(node) {
+      // 如果当前 node 节点不包含 children 属性, 则是三级节点或最后节点
+      // 而且 select=true , 则是该角色拥有的权限
+      if (!node.children && node.select) {
+        return this.defKeys.push(node.id)
+      }
+
+      node.children && node.children.forEach(item => {
+        this.getLeafKeys(item)
+      })
+    },
+    // 关闭分配权限对话框
+    assignDialogClose() {
+      this.checkedKeys = []
+      this.menuList = []
+      this.roleId = ''
+    },
+    // 分配菜单
+    saveRoleMenu() {
+      // 获取到当前子节点及父节点
+      const allCheckedNodes = this.$refs.tree.getCheckedNodes(false, true)
+      const idList = allCheckedNodes.map(node => node.id)
+      const assginMenuVo = {
+        roleId: this.roleId,
+        menuIdList: idList
+      }
+
+      saveRoleMenu(assginMenuVo).then(res => {
+        // 关闭对话框
+        this.assignDialogVisible = false
+        this.$message.success('分配权限成功')
+      })
+    },
     // 获取列表数据
     getList() {
       getPageList(this.page, this.limit, this.searchObj).then(res => {
