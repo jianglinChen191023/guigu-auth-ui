@@ -213,7 +213,7 @@ export default {
     },
     // 关闭分配权限对话框
     assignDialogClose() {
-      this.checkedKeys = []
+      this.defKeys = []
       this.menuList = []
       this.roleId = ''
     },
