@@ -233,6 +233,7 @@ export default {
         this.$message.success('分配权限成功')
       })
     },
+
     // 获取列表数据
     getList() {
       getPageList(this.page, this.limit, this.searchObj).then(res => {

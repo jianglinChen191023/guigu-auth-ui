@@ -11,7 +11,7 @@ export function saveRoleMenu(data) {
   })
 }
 
-// 根据角色id获取拥有的菜单id
+// 根据角色id获取菜单
 export function getMenuListByRoleId(roleId) {
   return request({
     url: `${api_name}/getMenuListByRoleId/${roleId}`,
