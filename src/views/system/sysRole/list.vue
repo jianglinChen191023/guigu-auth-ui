@@ -15,8 +15,8 @@
           </el-input>
         </el-col>
         <el-col :span="6">
-          <el-button type="primary" @click="showAddDialogVisible()">添加角色</el-button>
-          <el-button type="danger" @click="removeRoles()">批量删除</el-button>
+          <el-button type="primary" :disabled="$hasBP('btn.sysRole.add')" @click="showAddDialogVisible()">添加角色</el-button>
+          <el-button type="danger" :disabled="$hasBP('btn.sysRole.remove')" @click="removeRoles()">批量删除</el-button>
         </el-col>
       </el-row>
 
@@ -36,16 +36,16 @@
         <el-table-column label="操作" width="300px">
           <template slot-scope="scope">
             <!-- 修改 -->
-            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialogVisible(scope.row.id)">
+            <el-button size="mini" type="primary" icon="el-icon-edit" :disabled="$hasBP('btn.sysRole.update')" @click="showEditDialogVisible(scope.row.id)">
               编辑
             </el-button>
             <!-- 删除 -->
-            <el-button size="mini" type="danger" icon="el-icon-delete" @click="removeDataById(scope.row.id)">
+            <el-button size="mini" type="danger" icon="el-icon-delete" :disabled="$hasBP('btn.sysRole.remove')" @click="removeDataById(scope.row.id)">
               删除
             </el-button>
             <!-- 分配权限 -->
             <el-tooltip effect="dark" content="分配权限" placement="top-start" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini" @click="openAssignDialog(scope.row.id)">
+              <el-button type="warning" icon="el-icon-setting" size="mini" :disabled="$hasBP('btn.sysRole.add')" @click="openAssignDialog(scope.row.id)">
                 分配权限
               </el-button>
             </el-tooltip>

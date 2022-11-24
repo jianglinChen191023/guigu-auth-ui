@@ -15,6 +15,10 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+// 按钮权限控制
+import hasBtnPermission from '@/utils/btn-permission'
+Vue.prototype.$hasBP = hasBtnPermission
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

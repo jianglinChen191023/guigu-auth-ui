@@ -37,11 +37,11 @@ export const constantRoutes = [
     hidden: true
   },
 
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
-  },
+  // {
+  //   path: '/404',
+  //   component: () => import('@/views/404'),
+  //   hidden: true
+  // },
 
   {
     path: '/',
@@ -53,37 +53,37 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
-  },
+  }
 
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/sysRole/list',
-    meta: { title: '系统管理', icon: 'table' },
-    children: [
-      {
-        path: 'sysRole',
-        name: 'SysRole',
-        component: () => import('@/views/system/sysRole/list'),
-        meta: { title: '角色管理', icon: 'table' }
-      },
-      {
-        path: 'sysUser',
-        name: 'SysUser',
-        component: () => import('@/views/system/sysUser/list'),
-        meta: { title: '用户管理', icon: 'table' }
-      },
-      {
-        path: 'sysMenu',
-        name: 'SysMenu',
-        component: () => import('@/views/system/sysMenu/list'),
-        meta: { title: '菜单管理', icon: 'table' }
-      }
-    ]
-  },
+  // {
+  //   path: '/system',
+  //   component: Layout,
+  //   redirect: '/system/sysRole/list',
+  //   meta: { title: '系统管理', icon: 'table' },
+  //   children: [
+  //     {
+  //       path: 'sysRole',
+  //       name: 'SysRole',
+  //       component: () => import('@/views/system/sysRole/list'),
+  //       meta: { title: '角色管理', icon: 'table' }
+  //     },
+  //     {
+  //       path: 'sysUser',
+  //       name: 'SysUser',
+  //       component: () => import('@/views/system/sysUser/list'),
+  //       meta: { title: '用户管理', icon: 'table' }
+  //     },
+  //     {
+  //       path: 'sysMenu',
+  //       name: 'SysMenu',
+  //       component: () => import('@/views/system/sysMenu/list'),
+  //       meta: { title: '菜单管理', icon: 'table' }
+  //     }
+  //   ]
+  // },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({

@@ -4,7 +4,7 @@
     <el-card>
       <el-row>
         <el-col>
-          <el-button type="primary" @click="openSaveDialog()">添加菜单</el-button>
+          <el-button type="primary" :disabled="$hasBP('btn.sysMenu.add')" @click="openSaveDialog()">添加菜单</el-button>
         </el-col>
       </el-row>
 
@@ -43,15 +43,16 @@
               icon="el-icon-plus"
               size="mini"
               title="添加下级节点"
+              :disabled="$hasBP('btn.sysMenu.add')"
               @click="openSaveDialog(scope.row)"
             />
-            <el-button type="primary" icon="el-icon-edit" size="mini" title="修改" @click="openUpdateDialog(scope.row)" />
+            <el-button type="primary" icon="el-icon-edit" size="mini" title="修改" :disabled="$hasBP('btn.sysMenu.update')" @click="openUpdateDialog(scope.row)" />
             <el-button
               type="danger"
               icon="el-icon-delete"
               size="mini"
               title="删除"
-              :disabled="scope.row.hasChildren"
+              :disabled="scope.row.hasChildren || $hasBP('btn.sysMenu.add')"
               @click="removeById(scope.row)"
             />
           </template>

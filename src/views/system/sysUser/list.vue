@@ -28,8 +28,8 @@
           />
         </el-col>
         <el-col :span="6">
-          <el-button type="primary" @click="showAddDialogVisible()">添加用户</el-button>
-          <el-button type="danger" @click="removeRoles()">批量删除</el-button>
+          <el-button type="primary" :disabled="$hasBP('btn.sysUser.add')" @click="showAddDialogVisible()">添加用户</el-button>
+          <el-button type="danger" :disabled="$hasBP('btn.sysUser.remove')" @click="removeRoles()">批量删除</el-button>
         </el-col>
       </el-row>
 
@@ -65,12 +65,13 @@
         <el-table-column label="操作" width="180px">
           <template slot-scope="scope">
             <!-- 修改 -->
-            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialogVisible(scope.row.id)" />
+            <el-button size="mini" type="primary" icon="el-icon-edit" :disabled="$hasBP('btn.sysUser.update')" @click="showEditDialogVisible(scope.row.id)" />
             <!-- 删除 -->
             <el-button
               size="mini"
               type="danger"
               icon="el-icon-delete"
+              :disabled="$hasBP('btn.sysUser.remove')"
               @click="removeDataById(scope.row.id)"
             />
             <!-- 分配角色按钮 -->
@@ -79,6 +80,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                :disabled="$hasBP('btn.sysUser.add')"
                 @click="showAssignRole(scope.row)"
               />
             </el-tooltip>
