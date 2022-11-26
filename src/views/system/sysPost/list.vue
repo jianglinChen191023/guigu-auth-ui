@@ -2,9 +2,41 @@
   <div>
     <!-- 卡片视图区域 -->
     <el-card>
-      <el-row>
-        <el-col>
-          <el-button type="primary" :disabled="$hasBP('btn.sysDept.add')" @click="openSaveDialog()">添加部门</el-button>
+      <el-row :gutter="22">
+        <el-col :span="6">
+          <el-input
+            v-model="searchObj.name"
+            placeholder="请输入岗位名称"
+            class="input-with-select"
+            clearable
+            @clear="getList"
+          >
+            <el-button slot="append" icon="el-icon-search" @click="getList" />
+          </el-input>
+        </el-col>
+        <el-col :span="6">
+          <el-input
+            v-model="searchObj.postCode"
+            placeholder="请输入岗位编号"
+            class="input-with-select"
+            clearable
+            @clear="getList"
+          >
+            <el-button slot="append" icon="el-icon-search" @click="getList" />
+          </el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-select v-model="searchObj.status" placeholder="请选择" @change="getList">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-col>
+        <el-col :span="6">
+          <el-button type="primary" :disabled="$hasBP('btn.sysPost.add')" @click="openSaveDialog()">添加用户</el-button>
         </el-col>
       </el-row>
 
@@ -12,18 +44,24 @@
       <el-table
         :data="list"
         style="width: 100%"
-        row-key="id"
         border
-        :tree-props="{children: 'children'}"
       >
-        <el-table-column prop="name" label="名称" />
-        <el-table-column prop="leader" label="项目负责人" width="160" />
-        <el-table-column prop="phone" label="部门电话" width="180" />
+        <el-table-column
+          label="序号"
+          width="70"
+          align="center"
+        >
+          <template slot-scope="scope">
+            {{ (page - 1) * limit + scope.$index + 1 }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="岗位名称" />
+        <el-table-column prop="postCode" label="岗位编码" width="160" />
         <el-table-column label="状态" width="80">
           <template slot-scope="scope">
             <el-switch
               :value="scope.row.status === 1"
-              :disabled="$hasBP('btn.sysDept.update')"
+              :disabled="$hasBP('btn.sysPost.update')"
               @change="switchStatus(scope.row)"
             />
           </template>
@@ -32,19 +70,11 @@
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button
-              type="success"
-              icon="el-icon-plus"
-              size="mini"
-              title="添加下级部门"
-              :disabled="$hasBP('btn.sysDept.add')"
-              @click="openSaveDialog(scope.row)"
-            />
-            <el-button
               type="primary"
               icon="el-icon-edit"
               size="mini"
               title="修改"
-              :disabled="$hasBP('btn.sysDept.update')"
+              :disabled="$hasBP('btn.sysPost.update')"
               @click="openUpdateDialog(scope.row)"
             />
             <el-button
@@ -52,7 +82,7 @@
               icon="el-icon-delete"
               size="mini"
               title="删除"
-              :disabled="scope.row.hasChildren || $hasBP('btn.sysDept.remove')"
+              :disabled="$hasBP('btn.sysPost.remove')"
               @click="removeById(scope.row)"
             />
           </template>
@@ -67,21 +97,15 @@
       width="50%"
       @close="saveOrUpdateDialogClose"
     >
-      <el-form ref="addOrUpdateForm" :model="sysDept" :rules="sysDeptRules" label-width="80px">
-        <el-form-item v-if="sysDept.id === '' && sysDept.parentId !== 0" label="上级部门">
-          <el-input v-model="sysDept.parentName" disabled />
+      <el-form ref="addOrUpdateForm" :model="sysPost" :rules="sysPostRules" label-width="80px">
+        <el-form-item label="岗位名称" prop="name">
+          <el-input v-model="sysPost.name" />
         </el-form-item>
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="sysDept.name" />
-        </el-form-item>
-        <el-form-item label="负责人" prop="leader">
-          <el-input v-model="sysDept.leader" />
-        </el-form-item>
-        <el-form-item label="电话" prop="phone">
-          <el-input v-model="sysDept.phone" />
+        <el-form-item label="岗位编码" prop="postCode">
+          <el-input v-model="sysPost.postCode" />
         </el-form-item>
         <el-form-item label="状态" prop="type">
-          <el-radio-group v-model="sysDept.status">
+          <el-radio-group v-model="sysPost.status">
             <el-radio :label="1">正常</el-radio>
             <el-radio :label="0">停用</el-radio>
           </el-radio-group>
@@ -96,31 +120,43 @@
 </template>
 
 <script>
-import { save, update, updateStatus, getById, getAll, removeById } from '@/api/system/dept'
-import { checkPhone } from '@/utils/validate'
+import { save, update, updateStatus, getById, getPageList, removeById } from '@/api/system/post'
 
-const sysDeptObj = {
+const sysPostObj = {
   id: '',
-  parentId: '',
-  parentName: '',
   name: '',
-  leader: '',
-  phone: '',
+  postCode: '',
   status: 1
 }
 
 export default {
   // 定义数据
   data() {
-    const validatorPhone = (rule, value, callback) => {
-      if (!checkPhone(value)) {
-        callback(new Error('请输入合法的手机号'))
-      } else {
-        callback()
-      }
-    }
     return {
       list: [],
+      // 总记录数
+      total: 0,
+      // 当前页
+      page: 1,
+      // 每页显示记录数
+      limit: 10,
+      // 条件查询封装对象
+      searchObj: {
+        name: '',
+        postCode: '',
+        status: ''
+      },
+      options: [
+        {
+          value: '',
+          label: '全部'
+        }, {
+          value: '1',
+          label: '正常'
+        }, {
+          value: '0',
+          label: '停用'
+        }],
 
       /* 添加/修改对话框 */
       // 对话框标题
@@ -128,11 +164,10 @@ export default {
       // 控制添加/修改对话框显示或隐藏(默认)
       addOrUpdateDialogFormVisible: false,
       // 表单对象
-      sysDept: JSON.parse(JSON.stringify(sysDeptObj)),
-      sysDeptRules: {
-        name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-        leader: [{ required: true, message: '请输入负责人', trigger: 'blur' }],
-        phone: [{ required: true, trigger: 'blur', validator: validatorPhone }]
+      sysPost: JSON.parse(JSON.stringify(sysPostObj)),
+      sysPostRules: {
+        name: [{ required: true, message: '请输入岗位名称', trigger: 'blur' }],
+        postCode: [{ required: true, message: '请输入岗位编码', trigger: 'blur' }]
       }
     }
   },
@@ -145,27 +180,28 @@ export default {
   methods: {
     // 调用api层获取数据库中的数据
     getList() {
-      getAll().then(res => {
-        this.list = res.data
+      getPageList(this.page, this.limit, this.searchObj).then(res => {
+        this.list = res.data.records
+        this.total = res.data.total
       })
     },
 
     /* ========= start - 添加/修改对话框 ========= */
     // 关闭对话框
     saveOrUpdateDialogClose() {
-      this.sysDept = JSON.parse(JSON.stringify(sysDeptObj))
+      this.sysPost = JSON.parse(JSON.stringify(sysPostObj))
     },
     // 打开保存对话框
     openSaveDialog(row) {
       if (row) {
-        this.sysDept.parentId = row.id
-        this.sysDept.parentName = row.name
+        this.sysPost.parentId = row.id
+        this.sysPost.parentName = row.name
         // 对话框标题
         this.dialogTitle = '添加子部门'
       } else {
         // 对话框标题
         this.dialogTitle = '添加部门'
-        this.sysDept.parentId = 0
+        this.sysPost.parentId = 0
       }
 
       // 打开对话框
@@ -176,7 +212,7 @@ export default {
       // 根据id获取对象
       getById(row.id).then(res => {
         // 保存表单数据
-        this.sysDept = res.data
+        this.sysPost = res.data
         // 对话框标题
         this.dialogTitle = '修改菜单'
         // 打开对话框
@@ -188,7 +224,7 @@ export default {
       // 校验表单
       this.$refs.addOrUpdateForm.validate(valid => {
         if (valid) {
-          if (!this.sysDept.id) {
+          if (!this.sysPost.id) {
             // 无id保存
             this.save()
           } else {
@@ -200,7 +236,7 @@ export default {
     },
     // 调用API保存
     save() {
-      save(this.sysDept).then(res => {
+      save(this.sysPost).then(res => {
         // 关闭对话框
         this.addOrUpdateDialogFormVisible = false
         // 提示
@@ -211,7 +247,7 @@ export default {
     },
     // 调用API修改
     update() {
-      update(this.sysDept).then(res => {
+      update(this.sysPost).then(res => {
         // 关闭对话框
         this.addOrUpdateDialogFormVisible = false
         // 提示

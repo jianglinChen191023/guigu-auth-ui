@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-const api_name = '/admin/system/sysDept'
+const api_name = '/admin/system/sysPost'
 
 // 保存
 export function save(data) {
@@ -37,10 +37,11 @@ export function getById(id) {
 }
 
 // 列表
-export function getAll() {
+export function getPageList(page, limit, params) {
   return request({
-    url: `${api_name}/getAll`,
-    method: 'get'
+    url: `${api_name}/${page}/${limit}`,
+    method: 'get',
+    params
   })
 }
 
