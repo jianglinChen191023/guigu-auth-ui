@@ -88,6 +88,18 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- 分页区域 -->
+      <el-pagination
+        :current-page="page"
+        :page-sizes="[5, 10, 15, 20]"
+        :page-size="limit"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
     </el-card>
 
     <!-- 添加/修改对话框 -->
@@ -184,6 +196,14 @@ export default {
         this.list = res.data.records
         this.total = res.data.total
       })
+    },
+    handleSizeChange(newSize) {
+      this.limit = newSize
+      this.getList()
+    },
+    handleCurrentChange(newPage) {
+      this.page = newPage
+      this.getList()
     },
 
     /* ========= start - 添加/修改对话框 ========= */
