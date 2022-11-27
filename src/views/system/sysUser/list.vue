@@ -130,27 +130,6 @@
       </span>
     </el-dialog>
 
-    <!-- 分配角色对话框 -->
-    <el-dialog title="分配角色" :visible.sync="dialogRoleVisible">
-      <el-form label-width="80px">
-        <el-form-item label="用户名">
-          <el-input disabled :value="sysUser.username" />
-        </el-form-item>
-
-        <el-form-item label="角色列表">
-          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选
-          </el-checkbox>
-          <div style="margin: 15px 0;" />
-          <el-checkbox-group v-model="userRoleIds" @change="handleCheckedChange">
-            <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">{{ role.roleName }}</el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button type="primary" size="small" @click="assignRole">保存</el-button>
-        <el-button size="small" @click="dialogRoleVisible = false">取消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
