@@ -2,15 +2,6 @@ import request from '@/utils/request'
 
 const api_name = '/admin/system/sysMenu'
 
-// 角色菜单保存-分配权限
-export function saveRoleMenu(data) {
-  return request({
-    url: `${api_name}/saveRoleMenu`,
-    method: 'post',
-    data
-  })
-}
-
 // 根据角色id获取菜单
 export function getMenuListByRoleId(roleId) {
   return request({

@@ -2,6 +2,15 @@ import request from '@/utils/request'
 
 const api_name = '/admin/system/sysUser'
 
+// 分配角色
+export function doAssign(data) {
+  return request({
+    url: `${api_name}/doAssign`,
+    method: 'post',
+    data
+  })
+}
+
 // 保存
 export function save(data) {
   return request({
