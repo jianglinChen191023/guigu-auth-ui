@@ -45,7 +45,7 @@
             </el-button>
             <!-- 分配权限 -->
             <el-tooltip effect="dark" content="分配权限" placement="top-start" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini" :disabled="$hasBP('btn.sysRole.add')" @click="openAssignDialog(scope.row.id)">
+              <el-button type="warning" icon="el-icon-setting" size="mini" :disabled="$hasBP('btn.sysRole.assignAuth')" @click="openAssignDialog(scope.row.id)">
                 分配权限
               </el-button>
             </el-tooltip>
@@ -114,8 +114,8 @@
 </template>
 
 <script>
-import { getPageList, removeById, getRoleById, update, save, batchRemove } from '@/api/system/role'
-import { saveRoleMenu, getMenuListByRoleId } from '@/api/system/menu'
+import { getPageList, removeById, getRoleById, update, save, batchRemove, saveRoleMenu } from '@/api/system/role'
+import { getMenuListByRoleId } from '@/api/system/menu'
 
 export default {
   name: 'List',

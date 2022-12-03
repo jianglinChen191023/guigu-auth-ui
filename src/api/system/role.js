@@ -2,20 +2,20 @@ import request from '@/utils/request'
 
 const api_name = '/admin/system/sysRole'
 
+// 角色菜单保存-分配权限
+export function saveRoleMenu(data) {
+  return request({
+    url: `${api_name}/saveRoleMenu`,
+    method: 'post',
+    data
+  })
+}
+
 // 根据用户id获取角色
 export function getRolesByUserId(userId) {
   return request({
     url: `${api_name}/getRolesByUserId/${userId}`,
     method: 'get'
-  })
-}
-
-// 分配角色
-export function doAssign(data) {
-  return request({
-    url: `${api_name}/doAssign`,
-    method: 'post',
-    data
   })
 }
 

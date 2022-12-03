@@ -28,7 +28,8 @@
           />
         </el-col>
         <el-col :span="6">
-          <el-button type="primary" :disabled="$hasBP('btn.sysUser.add')" @click="showAddDialogVisible()">添加用户</el-button>
+          <el-button type="primary" :disabled="$hasBP('btn.sysUser.add')" @click="showAddDialogVisible()">添加用户
+          </el-button>
           <el-button type="danger" :disabled="$hasBP('btn.sysUser.remove')" @click="removeRoles()">批量删除</el-button>
         </el-col>
       </el-row>
@@ -65,7 +66,13 @@
         <el-table-column label="操作" width="180px">
           <template slot-scope="scope">
             <!-- 修改 -->
-            <el-button size="mini" type="primary" icon="el-icon-edit" :disabled="$hasBP('btn.sysUser.update')" @click="showEditDialogVisible(scope.row.id)" />
+            <el-button
+              size="mini"
+              type="primary"
+              icon="el-icon-edit"
+              :disabled="$hasBP('btn.sysUser.update')"
+              @click="showEditDialogVisible(scope.row.id)"
+            />
             <!-- 删除 -->
             <el-button
               size="mini"
@@ -80,7 +87,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
-                :disabled="$hasBP('btn.sysUser.add')"
+                :disabled="$hasBP('btn.sysUser.assignRole')"
                 @click="showAssignRole(scope.row)"
               />
             </el-tooltip>
@@ -130,12 +137,33 @@
       </span>
     </el-dialog>
 
+    <!-- 分配角色对话框 -->
+    <el-dialog title="分配角色" :visible.sync="dialogRoleVisible">
+      <el-form label-width="80px">
+        <el-form-item label="用户名">
+          <el-input disabled :value="sysUser.username" />
+        </el-form-item>
+
+        <el-form-item label="角色列表">
+          <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">全选
+          </el-checkbox>
+          <div style="margin: 15px 0;" />
+          <el-checkbox-group v-model="userRoleIds" @change="handleCheckedChange">
+            <el-checkbox v-for="role in allRoles" :key="role.id" :label="role.id">{{ role.roleName }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button type="primary" size="small" @click="assignRole">保存</el-button>
+        <el-button size="small" @click="dialogRoleVisible = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { save, updateStatus, update, getById, getPageList, removeById, removeByIds } from '@/api/system/user'
-import { getRolesByUserId, doAssign } from '@/api/system/role'
+import { save, updateStatus, update, getById, getPageList, removeById, removeByIds, doAssign } from '@/api/system/user'
+import { getRolesByUserId } from '@/api/system/role'
 
 export default {
   name: 'List',
