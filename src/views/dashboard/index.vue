@@ -33,8 +33,8 @@ export default {
         path: `${this.basePath}:81/#/login`
       },
       {
-        name: '通用权限系统',
-        path: `${this.basePath}:1127/#/login`
+        name: '硅谷课堂后台管理系统',
+        path: `${this.basePath}:8300/#/login`
       }
     ]
   },
